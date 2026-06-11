@@ -26,23 +26,17 @@ MY_PAID_API_KEY = "30DxNexGenBots4688e6"                 # သင်ဝယ်ထ
 def cookie_txt_file():
     """cookies folder ထဲက cookies.txt ဖိုင်လမ်းကြောင်းကို လုံးဝသေချာအောင် ရှာပေးသည်"""
     try:
-        # လက်ရှိ Youtube.py ရှိတဲ့နေရာကနေ နောက်ပြန်တွက်ပြီး cookies.txt ကို ရှာခြင်း
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        # သင့် Bot ရဲ့ root directory ကို သွားခြင်း
         root_dir = os.path.abspath(os.path.join(current_dir, "..", ".."))
         cookie_file = os.path.join(root_dir, "cookies", "cookies.txt")
         
         if os.path.exists(cookie_file):
-            print(f"[Cookie System] Found cookie file at: {cookie_file}")
             return cookie_file
             
-        # အကယ်၍ အပေါ်ကလမ်းကြောင်း အဆင်မပြေပါက လက်ရှိ working directory ကနေ ထပ်ရှာခြင်း
         fallback_file = os.path.join(os.getcwd(), "cookies", "cookies.txt")
         if os.path.exists(fallback_file):
-            print(f"[Cookie System] Found cookie file at fallback: {fallback_file}")
             return fallback_file
             
-        print("[Cookie System] CRITICAL: cookies.txt file NOT FOUND anywhere!")
         return None
     except Exception as e:
         print(f"[Cookie System] Error reading cookies directory: {e}")
@@ -66,7 +60,6 @@ async def search_song_api(query: str):
 async def download_song_paid_api(video_id: str):
     """သင်ဝယ်ထားသော API သုံးပြီး ဒေါင်းလုဒ်ဆွဲခြင်း"""
     try:
-        # ဝယ်ထားသော API ၏ endpoint ပုံစံအတိုင်း လိုအပ်က ပြင်နိုင်သည်
         download_url = f"{MY_PAID_API_URL}/api/yt/download?id={video_id}&key={MY_PAID_API_KEY}"
         async with aiohttp.ClientSession() as session:
             async with session.get(download_url, timeout=15) as response:
@@ -98,7 +91,7 @@ async def download_song(link: str):
         if os.path.exists(file_path):
             return file_path
 
-    # ၁။ သင်ဝယ်ထားတဲ့ Paid API ဖြင့် အရင်ဆုံး ကြိုးစားဒေါင်းယူမည်
+    # ၁။ Paid API ဖြင့် ဒေါင်းယူမည်
     try:
         print(f"[Paid API] Trying to download video_id: {video_id}")
         download_url = await download_song_paid_api(video_id)
@@ -113,15 +106,12 @@ async def download_song(link: str):
                                 if not chunk:
                                     break
                                 f.write(chunk)
-                        print("[Paid API] Download Successful.")
                         return file_path
     except Exception as e:
         print(f"[Paid API] Failed, falling back to cookies.txt/yt-dlp: {e}")
 
-    # ၂။ Paid API အလုပ်မလုပ်ပါက သို့မဟုတ် ကုန်သွားပါက cookies.txt ကိုသုံးပြီး Local yt-dlp ဖြင့် ဒေါင်းမည်
-    print("[Local] Paid API failed. Falling back to yt-dlp with cookies.txt file...")
+    # ၂။ Cookies သုံးပြီး Local yt-dlp ဖြင့် ဒေါင်းမည်
     loop = asyncio.get_running_loop()
-    
     def local_audio_dl():
         cookie_path = cookie_txt_file()
         ydl_opts = {
@@ -134,9 +124,6 @@ async def download_song(link: str):
         }
         if cookie_path:
             ydl_opts["cookiefile"] = cookie_path
-            print(f"[yt-dlp] Passing cookie file to yt-dlp: {cookie_path}")
-        else:
-            print("[yt-dlp] WARNING: Running yt-dlp WITHOUT cookies because file was not found!")
             
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=True)
@@ -145,7 +132,7 @@ async def download_song(link: str):
     try:
         return await loop.run_in_executor(None, local_audio_dl)
     except Exception as e:
-        print(f"[yt-dlp] Local download failed too: {e}")
+        print(f"[yt-dlp] Local download failed: {e}")
         return None
 
 async def check_file_size(link):
@@ -240,15 +227,16 @@ class YouTubeAPI:
         else:
             video_id = link
 
+        # နည်းလမ်း ၁။ Paid API ဖြင့် သီချင်း Details ကို အရင်ယူကြည့်မည်
         try:
             info_url = f"{MY_PAID_API_URL}/info/{video_id}"
             async with aiohttp.ClientSession() as session:
-                async with session.get(info_url, timeout=10) as response:
+                async with session.get(info_url, timeout=8) as response:
                     if response.status == 200:
                         data = await response.json()
-                        if data.get("status") == "success":
-                            info = data.get("data", {})
-                            title = info.get("title", "")
+                        if data.get("status") == "success" or "data" in data:
+                            info = data.get("data", data)
+                            title = info.get("title", "YouTube Track")
                             duration_min = info.get("duration", "0:00")
                             thumbnail = info.get("thumbnail", "")
                             duration_sec = 0 if str(duration_min) == "None" else int(time_to_seconds(duration_min))
@@ -256,6 +244,31 @@ class YouTubeAPI:
         except Exception:
             pass
         
+        # နည်းလမ်း ၂။ API မရပါက ကွတ်ကီးသုံးပြီး yt-dlp ဖြင့် သေချာပေါက် ဆွဲထုတ်မည် (ပိုမိုစိတ်ချရ)
+        try:
+            loop = asyncio.get_running_loop()
+            def fetch_with_ytdl():
+                ydl_opts = {"quiet": True, "no_warnings": True, "extract_flat": True}
+                cp = cookie_txt_file()
+                if cp: ydl_opts["cookiefile"] = cp
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    return ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=False)
+            
+            info = await loop.run_in_executor(None, fetch_with_ytdl)
+            title = info.get("title", "YouTube Track")
+            duration_sec = int(info.get("duration", 0))
+            
+            # Duration စက္ကန့်ကို mm:ss ပုံစံပြောင်းခြင်း
+            mins, secs = divmod(duration_sec, 60)
+            duration_min = f"{mins}:{secs:02d}"
+            
+            thumbnail = f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg"
+            return title, duration_min, duration_sec, thumbnail, video_id
+            
+        except Exception as e:
+            print(f"[Details Backup] yt-dlp backup failed: {e}")
+
+        # နည်းလမ်း ၃။ အပေါ်က ၂ ခုလုံးမရမှ မူလ VideosSearch ကို သုံးမည်
         results = VideosSearch(link, limit=1)
         for result in (await results.next())["result"]:
             title = result["title"]
