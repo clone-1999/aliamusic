@@ -18,50 +18,26 @@ from VenomMusic.utils.database import is_on_off
 from VenomMusic.utils.formatters import time_to_seconds
 
 # ========================================================
-# ၁။ API CONFIGURATION (အလုပ်လုပ်သော လုံးဝ Free API)
+# သင်ဝယ်ထားသော API configuration ကို ဤနေရာတွင် ထည့်ပါ
 # ========================================================
-NEW_API_URL = "https://api.v06.me"
-API_KEY = "free"
-
-# ========================================================
-# ၂။ HARDCODED YOUTUBE COOKIES DATA (စာသားထဲ တိုက်ရိုက်ထည့်သွင်းခြင်း)
-# ========================================================
-# သင်ပေးပို့ထားသော Cookies အသစ်စက်စက်ကို ဤနေရာတွင် တိုက်ရိုက်သိမ်းဆည်းထားပါသည်
-MY_COOKIES_TEXT = """# Netscape HTTP Cookie File
-# https://curl.haxx.se/rfc/cookie_spec.html
-# This is a generated file! Do not edit.
-
-.youtube.com  TRUE  /  TRUE  1771645301  LOGIN_INFO  AFmmF2swRQIhAPeUceY3QHqzUmr40ibIbZgxAb9C0zwq1ImKRaMISpNIAiBs69dacffXx_kY3qswguHzxtrEI0KSJhWQqJTAX6elXA:QUQ3MjNmd2ZpZFhPZy1SckY4VFRsZWVJNVlIMzFSNjgxdFRnN0xGODlrd0lwQzE3dDlpMHNVR29mdkoxalAzZW9NMXB2aER6Y1B5dUJXUFBIYTVrMUJpaHZvWXB3R3FYam81cnJzZ01sTm9jMVBjRXlBalVMSVlxWTIzZjFMQlJTbFk1YUl6cmhxejdUQ3JDUkZyb2t2cnhDaF9FY1hHZWFR
-.youtube.com  TRUE  /  TRUE  1803706157  PREF  f4=4000000&tz=America.Guatemala&f7=100&f5=20000
-.youtube.com  TRUE  /  FALSE  1803702813  HSID  AzEwUruLom4-XwkQu
-.youtube.com  TRUE  /  TRUE  1803702813  SSID  AaNOtVEgH6u3hTf4d
-.youtube.com  TRUE  /  FALSE  1803702813  APISID  _jD5F8_c3ottRvgT/Aa5VGOj4XKWf2LCCK
-.youtube.com  TRUE  /  TRUE  1803702813  SAPISID  gl0kG0BYo2tyebpy/ApRzIVLeSUrR-K1ey
-.youtube.com  TRUE  /  TRUE  1803702813  __Secure-1PAPISID  gl0kG0BYo2tyebpy/ApRzIVLeSUrR-K1ey
-.youtube.com  TRUE  /  TRUE  1803702813  __Secure-3PAPISID  gl0kG0BYo2tyebpy/ApRzIVLeSUrR-K1ey
-.youtube.com  TRUE  /  FALSE  1803702813  SID  g.a0006Ai2dHcEVFaNAiR6ztLa0zvVIoMXBIap0KeYzgDZYmtBuki6du3kTTZMAaC35pDqDg6S9wACgYKAc0SARcSFQHGX2Mib_wNmHUwm7igI6kgNUUKjxoVAUF8yKpSvCTlJ5W0ebCERn91LItz0076
-.youtube.com  TRUE  /  TRUE  1803702813  __Secure-1PSID  g.a0006Ai2dHcEVFaNAiR6ztLa0zvVIoMXBIap0KeYzgDZYmtBuki6E_F_ZQsTPIwibfYawZU21QACgYKAdoSARcSFQHGX2MiX1ntOUefsMm8p5-weSszIBoVAUF8yKo5GBbitSFh-Ifhnrw33n3u0076
-.youtube.com  TRUE  /  TRUE  1803702813  __Secure-3PSID  g.a0006Ai2dHcEVFaNAiR6ztLa0zvVIoMXBIap0KeYzgDZYmtBuki6Skiv6cFhVJxy1TZLLK2Q6AACgYKAbYSARcSFQHGX2MiC26Zfvg_y2-pyArWKMdOLRoVAUF8yKpn4Ekm94ZWwDvlxez8iuHT0076
-.youtube.com  TRUE  /  TRUE  1800682167  __Secure-1PSIDTS  sidts-CjQB7I_69KExocpfh8AoXfbzwmrbIK5wyTo_4sQ8BahjOEDVpt1hfKUhHekuL1wpL5XZJlUYEAA
-.youtube.com  TRUE  /  TRUE  1800682167  __Secure-3PSIDTS  sidts-CjQB7I_69KExocpfh8AoXfbzwmrbIK5wyTo_4sQ8BahjOEDVpt1hfKUhHekuL1wpL5XZJlUYEAA
-.youtube.com  TRUE  /  FALSE  1800682170  SIDCC  AKEyXzUeAdH-92qHBG2XQoQlNfQ4IG9aVN0nGYw6p28tKEQSIZxSV2U5TH2F_lRC7Z-LvRkfpA
-.youtube.com  TRUE  /  TRUE  1800682170  __Secure-1PSIDCC  AKEyXzU-apGpVVdOJDBAhcc11LGFm-vA_792uw1_WkxczQKCg40mSUY88r7Qcesii472nolYym4
-.youtube.com  TRUE  /  TRUE  1800682170  __Secure-3PSIDCC  AKEyXzXGD5AVknQ6gY3Ycjt_U4rLGgjcOInYlMVCcI-8tvKHhzHMoLn-1hbDpX02yDelavQZhQ
-.youtube.com  TRUE  /  TRUE  1784698151  VISITOR_INFO1_LIVE  VkCJsATDS9M
-.youtube.com  TRUE  /  TRUE  1784698151  VISITOR_PRIVACY_METADATA  CgJNTRIEGgAgHw%3D%3D
-.youtube.com  TRUE  /  TRUE  1784694813  __Secure-ROLLOUT_TOKEN  CJ3jx7ncs_iGrwEQ6_bNiev7igMY0-_Rx-qgkgM%3D
-.youtube.com  TRUE  /  TRUE  0  YSC  NJSFiW2pzmY"""
+MY_PAID_API_URL = "https://console.nexgenbots.xyz"  # သင်ဝယ်ထားတဲ့ API URL ကို ပြောင်းထည့်နိုင်သည်
+MY_PAID_API_KEY = "30DxNexGenBots4688e6"                 # သင်ဝယ်ထားတဲ့ API KEY ကို ပြောင်းထည့်နိုင်သည်
 
 def cookie_txt_file():
-    """အပေါ်က ကွတ်ကီးစာသားကို ယာယီဖိုင်အဖြစ် ဆောက်ပြီး လမ်းကြောင်းပြန်ပေးသည်"""
+    """cookies folder ထဲက cookies.txt ဖိုင်ကို တိုက်ရိုက်ယူသုံးသည်"""
     try:
-        cookie_path = os.path.join(os.getcwd(), "downloads", "tg_youtube_cookie.txt")
-        os.makedirs(os.path.dirname(cookie_path), exist_ok=True)
-        with open(cookie_path, "w", encoding="utf-8") as f:
-            f.write(MY_COOKIES_TEXT.strip())
-        return cookie_path
+        cookie_dir = os.path.join(os.getcwd(), "cookies")
+        cookie_file = os.path.join(cookie_dir, "cookies.txt")
+        if os.path.exists(cookie_file):
+            return cookie_file
+        
+        # ကံမကောင်းကြောင်း cookies.txt နာမည်လွဲနေလျှင် တခြား .txt ကို ရှာမည်
+        cookies_files = [f for f in os.listdir(cookie_dir) if f.endswith(".txt")]
+        if cookies_files:
+            return os.path.join(cookie_dir, random.choice(cookies_files))
+        return None
     except Exception as e:
-        print(f"Error creating inline cookie file: {e}")
+        print(f"Error reading cookies directory: {e}")
         return None
 
 async def search_song_api(query: str):
@@ -79,10 +55,11 @@ async def search_song_api(query: str):
         print(f"Error searching with API: {e}")
         return None
 
-async def download_song_new_api(video_id: str):
-    """Download song using api.v06.me"""
+async def download_song_paid_api(video_id: str):
+    """သင်ဝယ်ထားသော API သုံးပြီး ဒေါင်းလုဒ်ဆွဲခြင်း"""
     try:
-        download_url = f"{NEW_API_URL}/api/yt/download?id={video_id}"
+        # ဝယ်ထားသော API ၏ endpoint ပုံစံအတိုင်း လိုအပ်က ပြင်နိုင်သည်
+        download_url = f"{MY_PAID_API_URL}/api/yt/download?id={video_id}&key={MY_PAID_API_KEY}"
         async with aiohttp.ClientSession() as session:
             async with session.get(download_url, timeout=15) as response:
                 if response.status == 200:
@@ -93,11 +70,11 @@ async def download_song_new_api(video_id: str):
                         return audio_link
         return None
     except Exception as e:
-        print(f"Error downloading with new API: {e}")
+        print(f"Error downloading with paid API: {e}")
         return None
 
 async def download_song(link: str):
-    """သီချင်းဒေါင်းလုဒ်လုပ်ရန် အဓိက Function (API -> Cookies System)"""
+    """သီချင်းဒေါင်းလုဒ်လုပ်ရန် အဓိက Function (Paid API -> cookies.txt Fallback)"""
     if "v=" in link:
         video_id = link.split('v=')[-1].split('&')[0]
     elif "youtu.be/" in link:
@@ -113,10 +90,10 @@ async def download_song(link: str):
         if os.path.exists(file_path):
             return file_path
 
-    # ၁။ API အသစ်ဖြင့် အရင်ကြိုးစားဒေါင်းမည်
+    # ၁။ သင်ဝယ်ထားတဲ့ Paid API ဖြင့် အရင်ဆုံး ကြိုးစားဒေါင်းယူမည်
     try:
-        print(f"[API] Trying to download video_id: {video_id}")
-        download_url = await download_song_new_api(video_id)
+        print(f"[Paid API] Trying to download video_id: {video_id}")
+        download_url = await download_song_paid_api(video_id)
         if download_url:
             async with aiohttp.ClientSession() as session:
                 async with session.get(download_url, timeout=30) as file_response:
@@ -128,13 +105,13 @@ async def download_song(link: str):
                                 if not chunk:
                                     break
                                 f.write(chunk)
-                        print("[API] Download Successful.")
+                        print("[Paid API] Download Successful.")
                         return file_path
     except Exception as e:
-        print(f"[API] Failed, falling back to cookies/yt-dlp: {e}")
+        print(f"[Paid API] Failed, falling back to cookies.txt/yt-dlp: {e}")
 
-    # ၂။ API မရတော့ပါက ကုဒ်ထဲက ၄င်း Cookies သုံးပြီး Local yt-dlp ဖြင့် ဒေါင်းမည်
-    print("[Local] API failed/exhausted. Using yt-dlp with inline cookies...")
+    # ၂။ Paid API အလုပ်မလုပ်ပါက သို့မဟုတ် ကုန်သွားပါက cookies.txt ကိုသုံးပြီး Local yt-dlp ဖြင့် ဒေါင်းမည်
+    print("[Local] Using yt-dlp with cookies.txt file...")
     loop = asyncio.get_running_loop()
     
     def local_audio_dl():
@@ -149,6 +126,7 @@ async def download_song(link: str):
         }
         if cookie_path:
             ydl_opts["cookiefile"] = cookie_path
+            print(f"[yt-dlp] Passing cookie file: {cookie_path}")
             
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=True)
@@ -253,7 +231,7 @@ class YouTubeAPI:
             video_id = link
 
         try:
-            info_url = f"{NEW_API_URL}/info/{video_id}"
+            info_url = f"{MY_PAID_API_URL}/info/{video_id}"
             async with aiohttp.ClientSession() as session:
                 async with session.get(info_url, timeout=10) as response:
                     if response.status == 200:
@@ -320,7 +298,7 @@ class YouTubeAPI:
         cookie_path = cookie_txt_file()
         cookie_str = f"--cookies {cookie_path}" if cookie_path else ""
         playlist = await shell_cmd(
-            f"yt-dlp - i --get-id --flat-playlist {cookie_str} --playlist-end {limit} --skip-download {link}"
+            f"yt-dlp -i --get-id --flat-playlist {cookie_str} --playlist-end {limit} --skip-download {link}"
         )
         try:
             result = playlist.split("\n")
