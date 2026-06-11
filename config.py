@@ -16,7 +16,7 @@ BOT_TOKEN = getenv("BOT_TOKEN")
 # Get your mongo url from cloud.mongodb.com
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 
-DURATION_LIMIT_MIN = int(getenv("DURATION_LIMIT", 1700))
+DURATION_LIMIT_MIN = int(getenv("DURATION_LIMIT", 36000))
 
 # Chat id of a group for logging bot's activities
 LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", -1002638427943))
@@ -30,26 +30,26 @@ HEROKU_APP_NAME = getenv("HEROKU_APP_NAME")
 # Get it from http://dashboard.heroku.com/account
 HEROKU_API_KEY = getenv("HEROKU_API_KEY")
 
-API_URL = getenv("API_URL", 'https://api.thequickearn.xyz') #youtube song url
+API_URL = getenv("API_URL", 'https://console.nexgenbots.xyz') #youtube song url
 API_KEY = getenv("API_KEY", None) # youtube song api key, generate free key or buy paid plan from panel.thequickearn.xyz
 
 UPSTREAM_REPO = getenv(
     "UPSTREAM_REPO",
-    "https://github.com/Suraj08832/aliamusic",
+    "https://github.com/baby-7052/aliamusic",
 )
 UPSTREAM_BRANCH = getenv("UPSTREAM_BRANCH", "master")
 GIT_TOKEN = getenv(
     "GIT_TOKEN", None
 )  # Fill this variable if your upstream repository is private
 
-SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/Drishtarishi_community")
-SUPPORT_GROUP = getenv("SUPPORT_GROUP", "https://t.me/Drishtarishi_community")
+SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/myanmarbot_music")
+SUPPORT_GROUP = getenv("SUPPORT_GROUP", "https://t.me/myanmar_music_bot2027")
 
 # Set this to True if you want the assistant to automatically leave chats after an interval
 AUTO_LEAVING_ASSISTANT = bool(getenv("AUTO_LEAVING_ASSISTANT", False))
 
 # make your bots privacy from telegra.ph and put your url here 
-PRIVACY_LINK = getenv("PRIVACY_LINK", "https://telegra.ph/Privacy-Policy-for-VenomMusic-08-14")
+PRIVACY_LINK = getenv("PRIVACY_LINK", "https://t.me/vip_king1999")
 
 
 # Get this credentials from https://developer.spotify.com/dashboard
@@ -84,10 +84,10 @@ confirmer = {}
 
 
 START_IMG_URL = getenv(
-    "START_IMG_URL", "https://files.catbox.moe/cudvlq.jpg"
+    "START_IMG_URL", "https://graph.org/file/91f8d6a8fd408555c2aa4-202c7be9409983cefd.jpg"
 )
 PING_IMG_URL = getenv(
-    "PING_IMG_URL", "https://files.catbox.moe/cudvlq.jpg"
+    "PING_IMG_URL", "https://graph.org//file/389a372e8ae039320ca6c.png"
 )
 PLAYLIST_IMG_URL = "https://files.catbox.moe/pfjgmf.jpg"
 STATS_IMG_URL = "https://files.catbox.moe/st6utj.jpg"
