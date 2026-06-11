@@ -20,24 +20,32 @@ from VenomMusic.utils.formatters import time_to_seconds
 # ========================================================
 # သင်ဝယ်ထားသော API configuration ကို ဤနေရာတွင် ထည့်ပါ
 # ========================================================
-MY_PAID_API_URL = "https://console.nexgenbots.xyz"  # သင်ဝယ်ထားတဲ့ API URL ကို ပြောင်းထည့်နိုင်သည်
-MY_PAID_API_KEY = "30DxNexGenBots4688e6"                 # သင်ဝယ်ထားတဲ့ API KEY ကို ပြောင်းထည့်နိုင်သည်
+MY_PAID_API_URL = "https://console.nexgenbots.xyz"  # သင်ဝယ်ထားတဲ့ API URL ကို ပြောင်းထည့်ပါ
+MY_PAID_API_KEY = "30DxNexGenBots4688e6"                 # သင်ဝယ်ထားတဲ့ API KEY ကို ပြောင်းထည့်ပါ
 
 def cookie_txt_file():
-    """cookies folder ထဲက cookies.txt ဖိုင်ကို တိုက်ရိုက်ယူသုံးသည်"""
+    """cookies folder ထဲက cookies.txt ဖိုင်လမ်းကြောင်းကို လုံးဝသေချာအောင် ရှာပေးသည်"""
     try:
-        cookie_dir = os.path.join(os.getcwd(), "cookies")
-        cookie_file = os.path.join(cookie_dir, "cookies.txt")
-        if os.path.exists(cookie_file):
-            return cookie_file
+        # လက်ရှိ Youtube.py ရှိတဲ့နေရာကနေ နောက်ပြန်တွက်ပြီး cookies.txt ကို ရှာခြင်း
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        # သင့် Bot ရဲ့ root directory ကို သွားခြင်း
+        root_dir = os.path.abspath(os.path.join(current_dir, "..", ".."))
+        cookie_file = os.path.join(root_dir, "cookies", "cookies.txt")
         
-        # ကံမကောင်းကြောင်း cookies.txt နာမည်လွဲနေလျှင် တခြား .txt ကို ရှာမည်
-        cookies_files = [f for f in os.listdir(cookie_dir) if f.endswith(".txt")]
-        if cookies_files:
-            return os.path.join(cookie_dir, random.choice(cookies_files))
+        if os.path.exists(cookie_file):
+            print(f"[Cookie System] Found cookie file at: {cookie_file}")
+            return cookie_file
+            
+        # အကယ်၍ အပေါ်ကလမ်းကြောင်း အဆင်မပြေပါက လက်ရှိ working directory ကနေ ထပ်ရှာခြင်း
+        fallback_file = os.path.join(os.getcwd(), "cookies", "cookies.txt")
+        if os.path.exists(fallback_file):
+            print(f"[Cookie System] Found cookie file at fallback: {fallback_file}")
+            return fallback_file
+            
+        print("[Cookie System] CRITICAL: cookies.txt file NOT FOUND anywhere!")
         return None
     except Exception as e:
-        print(f"Error reading cookies directory: {e}")
+        print(f"[Cookie System] Error reading cookies directory: {e}")
         return None
 
 async def search_song_api(query: str):
@@ -111,7 +119,7 @@ async def download_song(link: str):
         print(f"[Paid API] Failed, falling back to cookies.txt/yt-dlp: {e}")
 
     # ၂။ Paid API အလုပ်မလုပ်ပါက သို့မဟုတ် ကုန်သွားပါက cookies.txt ကိုသုံးပြီး Local yt-dlp ဖြင့် ဒေါင်းမည်
-    print("[Local] Using yt-dlp with cookies.txt file...")
+    print("[Local] Paid API failed. Falling back to yt-dlp with cookies.txt file...")
     loop = asyncio.get_running_loop()
     
     def local_audio_dl():
@@ -126,7 +134,9 @@ async def download_song(link: str):
         }
         if cookie_path:
             ydl_opts["cookiefile"] = cookie_path
-            print(f"[yt-dlp] Passing cookie file: {cookie_path}")
+            print(f"[yt-dlp] Passing cookie file to yt-dlp: {cookie_path}")
+        else:
+            print("[yt-dlp] WARNING: Running yt-dlp WITHOUT cookies because file was not found!")
             
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=True)
