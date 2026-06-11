@@ -19,7 +19,7 @@ import config
 from config import API_URL, API_KEY
 
 # New API endpoint
-NEW_API_URL = "https://apikeyy-zeta.vercel.app/api"
+NEW_API_URL = "https://console.nexgenbots.xyz"
 
 def cookie_txt_file():
     cookie_dir = f"{os.getcwd()}/cookies"
